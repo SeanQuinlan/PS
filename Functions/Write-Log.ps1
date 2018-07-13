@@ -81,10 +81,6 @@ function Write-Log {
         $OutWarning
     )
 
-    begin {
-        $PSBoundParameters.GetEnumerator() | ForEach-Object { Write-Verbose ('Arguments: {0} - {1}' -f $_.Key,($_.Value -join ' ')) }
-    }
-
     process {
         foreach ($Line in $Message) {
             '{0} {1}' -f $DatePrefix,$Line | Out-File -FilePath $Path -Append
