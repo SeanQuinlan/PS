@@ -23,15 +23,15 @@ function New-Shortcut {
         Email:  sean@yster.org
     #>
 
-    [cmdletbinding()]
+    [CmdletBinding()]
     param(
         # Name of the shortcut
-        [parameter(Mandatory=$true)]
-        [string]
+        [Parameter(Mandatory=$true)]
+        [String]
         $Name,
 
         # The folder to create the shortcut in. Default is the user's desktop
-        [validatescript({
+        [ValidateScript({
             if (-not (Test-Path -Path $_)) {
                 throw ('Folder "{0}" not found!' -f $_)
             } elseif (-not (Test-Path -Path $_ -PathType Container)) {
@@ -40,12 +40,12 @@ function New-Shortcut {
                 $true
             }
         })]
-        [string]
+        [String]
         $Folder = (Get-ItemProperty -Path 'HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Shell Folders' -Name 'Desktop').Desktop,
 
         # The path to the target of the shortcut
-        [parameter(Mandatory=$true)]
-        [validatescript({
+        [Parameter(Mandatory=$true)]
+        [ValidateScript({
             if (-not $_) {
                 throw ('Target cannot be null')
             } elseif (-not (Test-Path -Path $_)) {
@@ -54,11 +54,11 @@ function New-Shortcut {
                 $true
             }
         })]
-        [string]
+        [String]
         $Target,
 
         # The folder to start in. Default is to the same folder as the shortcut is in
-        [validatescript({
+        [ValidateScript({
             if (-not (Test-Path -Path $_)) {
                 throw ('Start In folder "{0}" not found!' -f $_)
             } elseif (-not (Test-Path -Path $_ -PathType Container)) {
@@ -67,40 +67,40 @@ function New-Shortcut {
                 $true
             }
         })]
-        [alias('WorkingDir','WorkingDirectory')]
-        [string]
+        [Alias('WorkingDir','WorkingDirectory')]
+        [String]
         $StartIn = $Folder,
 
         # The arguments for the target line
-        [string]
+        [String]
         $Arguments,
 
         # The description for the shortcut
-        [validatenotnullorempty()]
-        [alias('Description')]
-        [string]
+        [ValidateNotNullOrEmpty()]
+        [Alias('Description')]
+        [String]
         $Comment,
 
         # The path to the icon file. Defaults to the first icon in the Target file
-        [string]
+        [String]
         $IconPath,
 
         # The index of the icon within the IconPath file. Note: Starts at 0
-        [string]
+        [String]
         $IconIndex = '0',
 
         # The type of window for the shortcut
-        [validateset('Maximized','Minimized','Default')]
-        [string]
+        [ValidateSet('Maximized','Minimized','Default')]
+        [String]
         $WindowStyle = 'Default',
 
         # Set the "Run as Administrator" checkbox
-        [alias('Admin','Administrator','Elevated')]
-        [switch]
+        [Alias('Admin','Administrator','Elevated')]
+        [Switch]
         $RunAsAdmin,
 
         # Overwrite any existing shortcut
-        [switch]
+        [Switch]
         $Force
     )
 
@@ -155,9 +155,9 @@ function New-Shortcut {
 
     if($RunAsAdmin) {
         Write-Verbose ('Setting "Run as Administrator" checkbox')
-        $Shortcut_All_Bytes = [system.io.file]::ReadAllBytes($Shortcut_Path)
+        $Shortcut_All_Bytes = [System.IO.File]::ReadAllBytes($Shortcut_Path)
         # Set byte 21 (0x15) bit 5 (0x20) to ON
         $Shortcut_All_Bytes[0x15] = $Shortcut_All_Bytes[0x15] -bor 0x20
-        [system.io.file]::WriteAllBytes($Shortcut_Path, $Shortcut_All_Bytes)
+        [System.IO.File]::WriteAllBytes($Shortcut_Path, $Shortcut_All_Bytes)
     }
 }
