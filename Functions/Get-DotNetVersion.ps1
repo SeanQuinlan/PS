@@ -15,7 +15,7 @@ function Get-DotNetVersion {
     [CmdletBinding()]
     param(
         # Output all .NET versions found, not just the latest version
-        [switch]
+        [Switch]
         $All
     )
 
@@ -52,11 +52,11 @@ function Get-DotNetVersion {
         if ($_.Release) {
             $Release = $Version_Table[$_.Release]
         } elseif ($_.Version -match '^4\.0') {
-            $Release = [version]'4.0'
+            $Release = [Version]'4.0'
         } else {
-            $Release = [version]$_.PSChildName.TrimStart('v')
+            $Release = [Version]$_.PSChildName.TrimStart('v')
         }
-        [pscustomobject]@{
+        [PSCustomObject]@{
             'FrameworkType'     = $_.PSChildName
             'Version'           = $Release
             'Release'           = $_.Release

@@ -24,7 +24,7 @@ function Get-WindowsVersion {
     $VersionMajor,$VersionMinor,$VersionBuild = $WMICIMDetails.Version.Split('.')
 
     # Output the WindowsVersion object
-    [pscustomobject]@{
+    [PSCustomObject]@{
         'Caption'       = $WMICIMDetails.Caption
         'Version'       = $WMICIMDetails.Version
         'VersionMajor'  = $VersionMajor

@@ -33,7 +33,7 @@ function Write-Log {
         )]
         [ValidateNotNullOrEmpty()]
         [Alias('LogText','InputObject','Object','MessageData')]
-        [array]
+        [Array]
         $Message,
 
         # The path to the log file
@@ -41,43 +41,43 @@ function Write-Log {
                    Position=1
         )]
         [Alias('Log','LogFile','LogPath')]
-        [string]
+        [String]
         $Path = $(if ($script:WriteLogPath) { $script:WriteLogPath } else { (Join-Path -Path $PSScriptRoot -ChildPath ('{0}-{1}.log' -f ([io.fileinfo]$PSCommandPath).BaseName,(Get-Date -Format yyyyMMdd)))} ),
 
         # The DateFormat to prefix each line with
         [Alias('DateFormat')]
-        [string]
+        [String]
         $DatePrefix = $(if ($script:WriteLogDatePrefix) { $script:WriteLogDatePrefix } else { Get-Date -Format 'yyyy-MM-dd HH:mm:ss' } ),
 
         # Output to Debug stream
-        [switch]
+        [Switch]
         $OutDebug,
 
         # Output to Error stream
         [Alias('OutErr')]
-        [switch]
+        [Switch]
         $OutError,
 
         # Output to Host/Console stream
         [Alias('OutConsole')]
-        [switch]
+        [Switch]
         $OutHost,
 
         # Output to Information stream
         [Alias('OutInfo')]
-        [switch]
+        [Switch]
         $OutInformation,
 
         # Output to Progress stream
-        [switch]
+        [Switch]
         $OutProgress,
 
         # Output to Verbose stream
-        [switch]
+        [Switch]
         $OutVerbose,
 
         # Output to Warning stream
-        [switch]
+        [Switch]
         $OutWarning
     )
 

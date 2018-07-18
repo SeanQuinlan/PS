@@ -14,16 +14,16 @@ function Download-File {
     [CmdletBinding()]
     param(
         # The URL to the download file
-        [string]
+        [String]
         $URL,
 
         # The download folder. Defaults to TEMP environment variable
-        [string]
+        [String]
         $Folder = $env:TEMP
     )
 
     # Set the allowed security protocols to all versions of TLS
-    [net.servicepointmanager]::SecurityProtocol = [net.securityprotocoltype]'Tls,Tls11,Tls12'
+    [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]'Tls,Tls11,Tls12'
 
     $Download_File = Join-Path -Path $Folder -ChildPath (Split-Path -Path $URL -Leaf)
     $Download_Succeeded = $false
@@ -41,7 +41,7 @@ function Download-File {
     }
 
     # Return an object with the download details
-    [pscustomobject]@{
+    [PSCustomObject]@{
         'Succeeded' = $Download_Succeeded
         'Path'      = $Download_File
     }
