@@ -118,7 +118,8 @@ process {
                 }
             }
             catch {
-                Write-Error ('Unable to open registry on: {0}' -f $Current_ComputerName)
+                Write-Warning ('Unable to open registry on: {0}' -f $Current_ComputerName)
+                continue
             }
 
             foreach ($Registry_Location in $Registry_Locations) {
@@ -183,12 +184,10 @@ process {
                                 'UninstallString'   = ($Open_Registry_Hive.OpenSubKey($Current_SubKey)).GetValue('UninstallString')
                                 'InstallLocation'   = ($Open_Registry_Hive.OpenSubKey($Current_SubKey)).GetValue('InstallLocation')
                             }
-
                         }
                     }
                 }
             }
         }
-
     }
 }
