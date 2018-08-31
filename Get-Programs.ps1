@@ -56,9 +56,12 @@ begin {
         [CmdletBinding()]
         param(
             # The bytes to convert from
+            [Parameter(Mandatory=$true)]
+            [ValidateNotNullOrEmpty()]
             $Bytes,
 
             # The number of decimal places to return. Default is 2 decimal places
+            [ValidateNotNullOrEmpty()]
             [Int]
             $Decimals = 2,
 
