@@ -103,17 +103,23 @@ param(
     $Force
 )
 
-# Check whether the extension has been supplied and add ".lnk" if not
+$PSBoundParameters.GetEnumerator() | ForEach-Object { Write-Verbose ('- Arguments: {0} - {1}' -f $_.Key,($_.Value -join ' ')) }
+
+Write-Verbose ('Checking shortcut file name: {0}' -f $Name)
 $Name_Extension = $Name.Substring($Name.Length -4)
 if (($Name_Extension -ne '.lnk') -and ($Name_Extension -ne '.url')) {
+    Write-Verbose ('- Adding .lnk extension')
     $Name = '{0}.lnk' -f $Name
 }
+Write-Verbose ('Shortcut name: {0}' -f $Name)
 
-# The COM object will only accept a full path, so unwrap any relative paths here
+Write-Verbose ('Unwrapping paths...')
 $Folder = (Get-Item -Path $Folder).FullName
+Write-Verbose ('- $Folder: {0}' -f $Folder)
 $StartIn = (Get-Item -Path $StartIn).FullName
+Write-Verbose ('- $StartIn: {0}' -f $StartIn)
 
-# Check to see if the shortcut already exists and exit if the Force switch has not been supplied
+Write-Verbose ('Checking if shortcut already exists')
 $Shortcut_Path = Join-Path -Path $Folder -ChildPath $Name
 if ((Test-Path -Path $Shortcut_Path) -and (-not $Force)) {
     throw ('Shortcut already exists: {0}' -f $Shortcut_Path)
@@ -127,8 +133,8 @@ switch ($WindowStyle) {
     'Maximized' { $WindowStyleInt = 3 }
     'Default'   { $WindowStyleInt = 1 }
 }
+Write-Verbose ('Window Style: {0} [{1}]' -f $WindowStyle,$WindowStyleInt)
 
-# Create and save the shortcut
 Write-Verbose ('Creating shortcut with path: {0}' -f $Shortcut_Path)
 $Shell_Object = New-Object -ComObject Wscript.Shell
 $Shortcut_Object = $Shell_Object.CreateShortcut($Shortcut_Path)
