@@ -50,15 +50,15 @@ function Get-DotNetVersion {
 
     $DotNet_Versions | ForEach-Object {
         if ($_.Release) {
-            $Release = $Version_Table[$_.Release]
+            $Version = $Version_Table[$_.Release]
         } elseif ($_.Version -match '^4\.0') {
-            $Release = [Version]'4.0'
+            $Version = [Version]'4.0'
         } else {
-            $Release = [Version]$_.PSChildName.TrimStart('v')
+            $Version = [Version]$_.PSChildName.TrimStart('v')
         }
         [PSCustomObject]@{
             'FrameworkType'     = $_.PSChildName
-            'Version'           = $Release
+            'Version'           = $Version
             'Release'           = $_.Release
             'SpecificVersion'   = $_.Version
         }
