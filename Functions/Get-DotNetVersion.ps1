@@ -37,10 +37,12 @@ function Get-DotNetVersion {
         461310 = [version]'4.7.1'
         461808 = [version]'4.7.2'
         461814 = [version]'4.7.2'
+        528040 = [version]'4.8'
+        528049 = [version]'4.8'
     }
 
     $DotNet_Framework_RegKey = 'HKLM:\SOFTWARE\Microsoft\NET Framework Setup\NDP'
-    $All_DotNet_Framework_Keys = Get-ChildItem -Path $DotNet_Framework_RegKey -Recurse | Get-ItemProperty -Name 'Version','Release' -ErrorAction SilentlyContinue
+    $All_DotNet_Framework_Keys = Get-ChildItem -Path $DotNet_Framework_RegKey -Recurse | Get-ItemProperty -Name 'Version', 'Release' -ErrorAction SilentlyContinue
 
     if ($All) {
         $DotNet_Versions = $All_DotNet_Framework_Keys | Where-Object { $_.PSChildName -match '^(?!S|W)\p{L}' }
@@ -57,10 +59,10 @@ function Get-DotNetVersion {
             $Version = [Version]$_.PSChildName.TrimStart('v')
         }
         [PSCustomObject]@{
-            'FrameworkType'     = $_.PSChildName
-            'Version'           = $Version
-            'Release'           = $_.Release
-            'SpecificVersion'   = $_.Version
+            'FrameworkType'   = $_.PSChildName
+            'Version'         = $Version
+            'Release'         = $_.Release
+            'SpecificVersion' = $_.Version
         }
     }
 }
