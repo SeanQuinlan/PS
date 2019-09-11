@@ -1,25 +1,25 @@
 <#
-.SYNOPSIS
-Creates a shortcut, with a default location of the current user's desktop.
-.DESCRIPTION
-    Create a shortcut, to a file or URL, with options for all the relevant properties for a shortcut.
+    .SYNOPSIS
+    Creates a shortcut, with a default location of the current user's desktop.
+    .DESCRIPTION
+        Create a shortcut, to a file or URL, with options for all the relevant properties for a shortcut.
 
-    Defaults to creating the shortcut on the current user's desktop. Default icon is the first icon in target file.
-.EXAMPLE
-.\New-Shortcut.ps1 -Name 'Notepad' -Target 'C:\Windows\notepad.exe' -Comment 'Shortcut to Notepad on the Desktop'
+        Defaults to creating the shortcut on the current user's desktop. Default icon is the first icon in target file.
+    .EXAMPLE
+    .\New-Shortcut.ps1 -Name 'Notepad' -Target 'C:\Windows\notepad.exe' -Comment 'Shortcut to Notepad on the Desktop'
 
-Creates a shortcut to Notepad on the desktop.
-.EXAMPLE
-.\New-Shortcut.ps1 -Name 'Notepad' -Target 'C:\Windows\notepad.exe' -Arguments 'C:\Windows\WindowsUpdate.log' -Force
+    Creates a shortcut to Notepad on the desktop.
+    .EXAMPLE
+    .\New-Shortcut.ps1 -Name 'Notepad' -Target 'C:\Windows\notepad.exe' -Arguments 'C:\Windows\WindowsUpdate.log' -Force
 
-Creates a shortcut to Notepad on the desktop, which opens the WindowsUpate.log. Overwrites an existing shortcut if it exists.
-.EXAMPLE
-.\New-Shortcut.ps1 -Name 'Registry Editor' -Target 'C:\Windows\regedit.exe' -Folder 'C:\Users\Public\Desktop' -RunAsAdmin -Comment 'Shortcut to RegEdit which opens as Admin'
+    Creates a shortcut to Notepad on the desktop, which opens the WindowsUpate.log. Overwrites an existing shortcut if it exists.
+    .EXAMPLE
+    .\New-Shortcut.ps1 -Name 'Registry Editor' -Target 'C:\Windows\regedit.exe' -Folder 'C:\Users\Public\Desktop' -RunAsAdmin -Comment 'Shortcut to RegEdit which opens as Admin'
 
-Creates a shortcut to Registry Editor, which opens as Administrator, on the All User's desktop.
-.NOTES
-    Author: Sean Quinlan
-    Email:  sean@yster.org
+    Creates a shortcut to Registry Editor, which opens as Administrator, on the All User's desktop.
+    .NOTES
+        Author: Sean Quinlan
+        Email:  sean@yster.org
 #>
 
 [CmdletBinding()]
