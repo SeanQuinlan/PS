@@ -1,43 +1,50 @@
 # Some tests to find out the fastest method of iterating through and outputting every value in a hashtable.
 
 $Size = 100000
+$TestArray = 1..$Size
 $Output = New-Object -TypeName 'System.Collections.ArrayList'
 
 # Create the hashtable
-$Hashtable = @{}
-for ($i = 0; $i -lt $Size; $i++) {
-    $Hashtable["Key_$i"] = "Value_$i"
+$Hashtable = @{ }
+foreach ($i in $TestArray) {
+    $Hashtable.Add("Key_$($i)", "Value_$($i)")
 }
 
 # Simply iterate through the entire hashtable and output the values of each item.
-$HT_GetEnumerator = Measure-Command {
+$Measure_Hashtable = Measure-Command {
     foreach ($Entry in $Hashtable.GetEnumerator()) {
         $Entry.Value
     }
 }
-[void]$Output.Add([pscustomobject]@{
-        'Name' = 'Using GetEnumerator() method'
-        'Time' = $HT_GetEnumerator.TotalMilliseconds
-    })
+[void]$Output.Add(
+    [pscustomobject]@{
+        'Name' = 'Hashtable iterated using GetEnumerator() method'
+        'Time' = $Measure_Hashtable.TotalMilliseconds
+    }
+)
 
-$HT_SquareBrackets = Measure-Command {
+$Measure_Hashtable = Measure-Command {
     foreach ($Entry in $Hashtable.Keys) {
         $Hashtable[$Entry]
     }
 }
-[void]$Output.Add([pscustomobject]@{
-        'Name' = 'Using Square Brackets notation'
-        'Time' = $HT_SquareBrackets.TotalMilliseconds
-    })
+[void]$Output.Add(
+    [pscustomobject]@{
+        'Name' = 'Hashtable iterated using Square Brackets notation'
+        'Time' = $Measure_Hashtable.TotalMilliseconds
+    }
+)
 
-$HT_DotKey = Measure-Command {
+$Measure_Hashtable = Measure-Command {
     foreach ($Entry in $Hashtable.Keys) {
         $Hashtable.$Entry
     }
 }
-[void]$Output.Add([pscustomobject]@{
-        'Name' = 'Using Dot Notation'
-        'Time' = $HT_DotKey.TotalMilliseconds
-    })
+[void]$Output.Add(
+    [pscustomobject]@{
+        'Name' = 'Hashtable iterated using Dot notation'
+        'Time' = $Measure_Hashtable.TotalMilliseconds
+    }
+)
 
 $Output | Sort-Object Time -Descending

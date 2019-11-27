@@ -1,41 +1,151 @@
 # Some tests to find out the fastest method of creating/adding to a hashtable.
 
 $Size = 10000
+$TestArray = 1..$Size
 $Output = New-Object -TypeName 'System.Collections.ArrayList'
 
-$HT_PlusEquals = Measure-Command {
-    $Hashtable_PlusEquals = @{}
-    for ($i = 0; $i -lt $Size; $i++) {
-        $Hashtable_PlusEquals += @{
-            "Key_$i" = "Value_$i"
+# Using the traditional += method.
+$Measure_Hashtable = Measure-Command {
+    $Hashtable = @{ }
+    for ($i = 0; $i -lt $TestArray.Count; $i++) {
+        $Hashtable += @{
+            "Key_$($TestArray[$i])" = "Value_$($TestArray[$i])"
         }
     }
 }
-[void]$Output.Add([pscustomobject]@{
-        'Name' = 'Hashtable created via PlusEquals'
-        'Time' = $HT_PlusEquals.TotalMilliseconds
-    })
+Remove-Variable -Name Hashtable -ErrorAction Ignore
+[System.GC]::Collect()
+[void]$Output.Add(
+    [pscustomobject]@{
+        'Name' = 'Hashtable created via PlusEquals + for loop'
+        'Time' = $Measure_Hashtable.TotalMilliseconds
+    }
+)
 
-$HT_KeyAssignment = Measure-Command {
-    $Hashtable_KeyAssignment = @{}
-    for ($i = 0; $i -lt $Size; $i++) {
-        $Hashtable_KeyAssignment["Key_$i"] = "Value_$i"
+$Measure_Hashtable = Measure-Command {
+    $Hashtable = @{ }
+    foreach ($i in $TestArray) {
+        $Hashtable += @{
+            "Key_$($i)" = "Value_$($i)"
+        }
     }
 }
-[void]$Output.Add([pscustomobject]@{
-        'Name' = 'Hashtable created via Key Assignment'
-        'Time' = $HT_KeyAssignment.TotalMilliseconds
-    })
+Remove-Variable -Name Hashtable -ErrorAction Ignore
+[System.GC]::Collect()
+[void]$Output.Add(
+    [pscustomobject]@{
+        'Name' = 'Hashtable created via PlusEquals + foreach loop'
+        'Time' = $Measure_Hashtable.TotalMilliseconds
+    }
+)
 
-$HT_Add = Measure-Command {
-    $Hashtable_Add = @{}
-    for ($i = 0; $i -lt $Size; $i++) {
-        $Hashtable_Add.Add("Key_$i", "Value_$i")
+$Measure_Hashtable = Measure-Command {
+    $Hashtable = @{ }
+    $TestArray | ForEach-Object {
+        $Hashtable += @{
+            "Key_$($_)" = "Value_$($_)"
+        }
     }
 }
-[void]$Output.Add([pscustomobject]@{
-        'Name' = 'Hashtable created via .Add() method'
-        'Time' = $HT_Add.TotalMilliseconds
-    })
+Remove-Variable -Name Hashtable -ErrorAction Ignore
+[System.GC]::Collect()
+[void]$Output.Add(
+    [pscustomobject]@{
+        'Name' = 'Hashtable created via PlusEquals + foreach-object loop'
+        'Time' = $Measure_Hashtable.TotalMilliseconds
+    }
+)
+
+# Using direct key assignment.
+$Measure_Hashtable = Measure-Command {
+    $Hashtable = @{ }
+    for ($i = 0; $i -lt $TestArray.Count; $i++) {
+        $Hashtable["Key_$($TestArray[$i])"] = "Value_$($TestArray[$i])"
+    }
+}
+Remove-Variable -Name Hashtable -ErrorAction Ignore
+[System.GC]::Collect()
+[void]$Output.Add(
+    [pscustomobject]@{
+        'Name' = 'Hashtable created via Key Assignment + for loop'
+        'Time' = $Measure_Hashtable.TotalMilliseconds
+    }
+)
+
+$Measure_Hashtable = Measure-Command {
+    $Hashtable = @{ }
+    foreach ($i in $TestArray) {
+        $Hashtable["Key_$($i)"] = "Value_$($i)"
+    }
+}
+Remove-Variable -Name Hashtable -ErrorAction Ignore
+[System.GC]::Collect()
+[void]$Output.Add(
+    [pscustomobject]@{
+        'Name' = 'Hashtabe created via Key Assignment + foreach loop'
+        'Time' = $Measure_Hashtable.TotalMilliseconds
+    }
+)
+
+$Measure_Hashtable = Measure-Command {
+    $Hashtable = @{ }
+    $TestArray | ForEach-Object {
+        $Hashtable["Key_$($_)"] = "Value_$($_)"
+    }
+}
+Remove-Variable -Name Hashtable -ErrorAction Ignore
+[System.GC]::Collect()
+[void]$Output.Add(
+    [pscustomobject]@{
+        'Name' = 'Hashtable created via Key Assignment + foreach-object loop'
+        'Time' = $Measure_Hashtable.TotalMilliseconds
+    }
+)
+
+# Using the .Add() method.
+$Measure_Hashtable = Measure-Command {
+    $Hashtable = @{ }
+    for ($i = 0; $i -lt $TestArray.Count; $i++) {
+        $Hashtable.Add("Key_$($TestArray[$i])", "Value_$($TestArray[$i])")
+    }
+}
+Remove-Variable -Name Hashtable -ErrorAction Ignore
+[System.GC]::Collect()
+[void]$Output.Add(
+    [pscustomobject]@{
+        'Name' = 'Hashtable created via .Add() method + for loop'
+        'Time' = $Measure_Hashtable.TotalMilliseconds
+    }
+)
+
+$Measure_Hashtable = Measure-Command {
+    $Hashtable = @{ }
+    foreach ($i in $TestArray) {
+        $Hashtable.Add("Key_$($i)", "Value_$($i)")
+    }
+}
+Remove-Variable -Name Hashtable -ErrorAction Ignore
+[System.GC]::Collect()
+[void]$Output.Add(
+    [pscustomobject]@{
+        'Name' = 'Hashtabe created via .Add() method + foreach loop'
+        'Time' = $Measure_Hashtable.TotalMilliseconds
+    }
+)
+
+$Measure_Hashtable = Measure-Command {
+    $Hashtable = @{ }
+    $TestArray | ForEach-Object {
+        $Hashtable.Add("Key_$($_)", "Value_$($_)")
+    }
+}
+Remove-Variable -Name Hashtable -ErrorAction Ignore
+[System.GC]::Collect()
+[void]$Output.Add(
+    [pscustomobject]@{
+        'Name' = 'Hashtable created via .Add() method + foreach-object loop'
+        'Time' = $Measure_Hashtable.TotalMilliseconds
+    }
+)
 
 $Output | Sort-Object Time -Descending
