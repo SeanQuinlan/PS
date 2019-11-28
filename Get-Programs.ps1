@@ -24,12 +24,13 @@
 [CmdletBinding()]
 param(
     # Computer(s) to run against
-    [Parameter(ValueFromPipeline=$true)]
-    [Alias('Name','CN')]
+    [Parameter(Mandatory = $true, ValueFromPipeline = $true)]
+    [Alias('Name', 'CN')]
     [String[]]
     $ComputerName = 'localhost',
 
     # Include programs marked as SystemComponent
+    [Parameter(Mandatory = $false)]
     [Switch]
     $SystemComponent
 )
@@ -56,26 +57,28 @@ begin {
         [CmdletBinding()]
         param(
             # The bytes to convert from
-            [Parameter(Mandatory=$true)]
+            [Parameter(Mandatory = $true)]
             [ValidateNotNullOrEmpty()]
             $Bytes,
 
             # The number of decimal places to return. Default is 2 decimal places
+            [Parameter(Mandatory = $false)]
             [ValidateNotNullOrEmpty()]
             [Int]
             $Decimals = 2,
 
             # The special type of formatting to return
+            [Parameter(Mandatory = $false)]
             [ValidateSet('Programs')]
             [String]
             $FormatType
         )
 
         # All the possible size units
-        $Size_Units = @('B','KB','MB','GB','TB')
+        $Size_Units = @('B', 'KB', 'MB', 'GB', 'TB')
         $Index = 0
         while ($Bytes -gt 1KB) {
-            $Bytes = $Bytes/1KB
+            $Bytes = $Bytes / 1KB
             $Index++
         }
 
@@ -97,7 +100,7 @@ begin {
         "{0:N$($Decimals)} {1}" -f $Bytes, $Size_Units[$Index]
     }
 
-    $PSBoundParameters.GetEnumerator() | ForEach-Object { Write-Verbose ('Arguments: {0} - {1}' -f $_.Key,($_.Value -join ' ')) }
+    $PSBoundParameters.GetEnumerator() | ForEach-Object { Write-Verbose ('Arguments: {0} - {1}' -f $_.Key, ($_.Value -join ' ')) }
     $Registry_Locations = @('SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall')
     if ($env:PROCESSOR_ARCHITECTURE -eq 'x86') { Write-Warning 'Running in PowerShell (x86). Only x86 software will be captured. Run from PowerShell console on x64 machine to capture all software' }
     if ($env:PROCESSOR_ARCHITECTURE -eq 'AMD64') { $Registry_Locations += 'SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall' }
@@ -113,28 +116,26 @@ process {
 
         foreach ($Current_Registry_Hive in $Registry_Hives) {
             try {
-                Write-Verbose ('Opening {0} hive on: {1}' -f $Current_Registry_Hive,$Current_ComputerName)
+                Write-Verbose ('Opening {0} hive on: {1}' -f $Current_Registry_Hive, $Current_ComputerName)
                 if ($Registry_Hives -contains 'CurrentUser') {
                     $Open_Registry_Hive = [Microsoft.Win32.RegistryKey]::OpenBaseKey($Current_Registry_Hive, 'Default')
                 } else {
                     $Open_Registry_Hive = [Microsoft.Win32.RegistryKey]::OpenRemoteBaseKey($Current_Registry_Hive, $Current_ComputerName, 'Default')
                 }
-            }
-            catch {
+            } catch {
                 Write-Warning ('Unable to open registry on: {0}' -f $Current_ComputerName)
                 continue
             }
 
             foreach ($Registry_Location in $Registry_Locations) {
-                Write-Verbose ('{0}: [{1}] Opening key: {2}' -f $Current_ComputerName,$Current_Registry_Hive,$Registry_Location)
+                Write-Verbose ('{0}: [{1}] Opening key: {2}' -f $Current_ComputerName, $Current_Registry_Hive, $Registry_Location)
                 $Current_Reg_Key = $Open_Registry_Hive.OpenSubKey($Registry_Location)
 
                 # Sometimes the registry keys don't exist, so catch any errors here and set the subkeys variable to $null
                 try {
                     $Current_Reg_Key_Subkeys = $Current_Reg_Key.GetSubKeyNames()
                     Write-Verbose ('Found subkeys: {0}' -f $Current_Reg_Key_Subkeys -join ',')
-                }
-                catch {
+                } catch {
                     $Current_Reg_Key_Subkeys = $null
                     Write-Verbose ('No subkeys found')
                 }
@@ -162,9 +163,8 @@ process {
                                 # Sometimes the InstallDate is 8 digits but not a proper date (Discord does this)
                                 # So if we encounter an error in the date parsing, simply set the date to $null as a fall-back
                                 try {
-                                    $Current_SubKey_InstallDate = '{0:d}' -f [DateTime]::ParseExact($Current_SubKey_InstallDate,"yyyyMMdd",$null)
-                                }
-                                catch {
+                                    $Current_SubKey_InstallDate = '{0:d}' -f [DateTime]::ParseExact($Current_SubKey_InstallDate, "yyyyMMdd", $null)
+                                } catch {
                                     $Current_SubKey_InstallDate = $null
                                 }
                             }
@@ -172,20 +172,20 @@ process {
                             $Raw_Size = [int]$Current_SubKey_EstimatedSize
                             $Calculated_Size = $null
                             if ($Raw_Size) {
-                                $Calculated_Size = Get-FriendlySize -Bytes ($Raw_Size*1024) -FormatType 'Programs'
+                                $Calculated_Size = Get-FriendlySize -Bytes ($Raw_Size * 1024) -FormatType 'Programs'
                             }
 
                             [PSCustomObject]@{
-                                'Computer'          = $Current_ComputerName
-                                'Name'              = $Current_SubKey_DisplayName
-                                'Publisher'         = ($Open_Registry_Hive.OpenSubKey($Current_SubKey)).GetValue('Publisher')
-                                'InstalledOn'       = $Current_SubKey_InstallDate
-                                'Size'              = $Calculated_Size
-                                'SizeInKB'          = $Current_SubKey_EstimatedSize
-                                'Version'           = ($Open_Registry_Hive.OpenSubKey($Current_SubKey)).GetValue('DisplayVersion')
-                                'Path'              = '{0}:\{1}' -f $Current_Registry_Hive,$Current_SubKey
-                                'UninstallString'   = ($Open_Registry_Hive.OpenSubKey($Current_SubKey)).GetValue('UninstallString')
-                                'InstallLocation'   = ($Open_Registry_Hive.OpenSubKey($Current_SubKey)).GetValue('InstallLocation')
+                                'Computer'        = $Current_ComputerName
+                                'Name'            = $Current_SubKey_DisplayName
+                                'Publisher'       = ($Open_Registry_Hive.OpenSubKey($Current_SubKey)).GetValue('Publisher')
+                                'InstalledOn'     = $Current_SubKey_InstallDate
+                                'Size'            = $Calculated_Size
+                                'SizeInKB'        = $Current_SubKey_EstimatedSize
+                                'Version'         = ($Open_Registry_Hive.OpenSubKey($Current_SubKey)).GetValue('DisplayVersion')
+                                'Path'            = '{0}:\{1}' -f $Current_Registry_Hive, $Current_SubKey
+                                'UninstallString' = ($Open_Registry_Hive.OpenSubKey($Current_SubKey)).GetValue('UninstallString')
+                                'InstallLocation' = ($Open_Registry_Hive.OpenSubKey($Current_SubKey)).GetValue('InstallLocation')
                             }
                         }
                     }

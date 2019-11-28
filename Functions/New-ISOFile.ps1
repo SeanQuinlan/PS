@@ -22,20 +22,21 @@ function New-ISOFile {
     param(
         # Specifies the path or paths to the files that you want to add to the ISO file.
         [Parameter(
-            Mandatory=$true,
-            ValueFromPipeline=$true,
-            ValueFromPipelineByPropertyName=$true
+            Mandatory = $true,
+            ValueFromPipeline = $true,
+            ValueFromPipelineByPropertyName = $true
         )]
         [String[]]
         $Path,
 
         # Specifies the path to the ISO output file.
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory = $true)]
         [String]
         $DestinationPath,
 
         # The media type for the ISO file.
         # Taken from https://docs.microsoft.com/en-gb/windows/desktop/api/imapi2/ne-imapi2-_imapi_media_physical_type
+        [Parameter(Mandatory = $false)]
         [ValidateSet(
             'UNKNOWN',
             'CDROM',
@@ -63,27 +64,30 @@ function New-ISOFile {
         $MediaType = 'DVDPLUSR',
 
         # The volume name for the ISO file.
+        [Parameter(Mandatory = $false)]
         [String]
         $VolumeName,
 
         # The file system(s) to support.
         # From http://msdn.microsoft.com/en-us/library/windows/desktop/aa364840.aspx
+        [Parameter(Mandatory = $false)]
         [ValidateSet(
             'ISO9660',
             'Joliet',
             'UDF'
         )]
         [String[]]
-        $FileSystem = @('ISO9660','Joliet','UDF'),
+        $FileSystem = @('ISO9660', 'Joliet', 'UDF'),
 
         # Overwrite the DestinationPath if it already exists
+        [Parameter(Mandatory = $false)]
         [Switch]
         $Force
     )
 
     begin {
         Write-Verbose ('Function: {0} [begin]' -f (Get-Variable MyInvocation -Scope 0).Value.MyCommand.Name)
-        $PSBoundParameters.GetEnumerator() | ForEach-Object { Write-Verbose ('- Arguments: {0} - {1}' -f $_.Key,($_.Value -join ' ')) }
+        $PSBoundParameters.GetEnumerator() | ForEach-Object { Write-Verbose ('- Arguments: {0} - {1}' -f $_.Key, ($_.Value -join ' ')) }
 
         # List of all possible media types
         $Possible_MediaTypes = @(
@@ -117,9 +121,9 @@ function New-ISOFile {
 
         $FileSystem | ForEach-Object {
             switch ($_) {
-                'ISO9660'   { $FileSystems_ToCreate += 1 }
-                'Joliet'    { $FileSystems_ToCreate += 2 }
-                'UDF'       { $FileSystems_ToCreate += 4 }
+                'ISO9660' { $FileSystems_ToCreate += 1 }
+                'Joliet' { $FileSystems_ToCreate += 2 }
+                'UDF' { $FileSystems_ToCreate += 4 }
             }
         }
         Write-Verbose ('FileSystems_ToCreate: {0}' -f $FileSystems_ToCreate)
@@ -159,8 +163,7 @@ function New-ISOFile {
                         Write-Verbose ('- Adding path: {0}' -f $_.Path)
                         [void]$Input_Paths.Add($_.Path)
                     }
-                }
-                catch {
+                } catch {
                     throw ('Cannot find path "{0}" because it does not exist' -f $_.Path)
                 }
             } else {
@@ -188,8 +191,7 @@ function New-ISOFile {
             try {
                 Write-Verbose ('- Adding: {0}' -f $_)
                 $ISO_FileSystem.Root.AddTree($_, $false)
-            }
-            catch {
+            } catch {
                 # Break out if there are any errors adding files/folders to the file system
                 throw $_.Exception.Message
                 break
@@ -202,8 +204,7 @@ function New-ISOFile {
                 if ($VolumeName.Length -gt 32) { Write-Warning 'VolumeName is greater than 32 characters. Any characters after the 32nd will be ignored.' }
                 $ISO_FileSystem.VolumeName = $VolumeName
             }
-        }
-        catch {
+        } catch {
             # Break out if there are any problems setting the VolumeName
             throw $_.Exception.Message
             break
@@ -239,36 +240,36 @@ function Write-IStreamToFile {
     [CmdletBinding()]
     param(
         # The IStream COM object that will be written to file.
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory = $true)]
         [__ComObject]
         $IStream,
 
         # The path to the ISO file.
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory = $true)]
         [String]
         $Path
     )
 
     Write-Verbose ('Entering function: {0}' -f (Get-Variable MyInvocation -Scope 0).Value.MyCommand.Name)
-    $PSBoundParameters.GetEnumerator() | ForEach-Object { Write-Verbose ('- Arguments: {0} - {1}' -f $_.Key,($_.Value -join ' ')) }
+    $PSBoundParameters.GetEnumerator() | ForEach-Object { Write-Verbose ('- Arguments: {0} - {1}' -f $_.Key, ($_.Value -join ' ')) }
 
-	# NOTE: We cannot use [System.Runtime.InteropServices.ComTypes.IStream],
-	# since PowerShell apparently cannot convert an IStream COM object to this
-	# Powershell type.  (See http://stackoverflow.com/a/9037299/223837 for
-	# details.)
-	#
-	# It turns out that .NET/CLR _can_ do this conversion.
-	#
-	# That is the reason why method FileUtil.WriteIStreamToFile(), below,
-	# takes an object, and casts it to an IStream, instead of directly
-	# taking an IStream inputStream argument.
+    # NOTE: We cannot use [System.Runtime.InteropServices.ComTypes.IStream],
+    # since PowerShell apparently cannot convert an IStream COM object to this
+    # Powershell type.  (See http://stackoverflow.com/a/9037299/223837 for
+    # details.)
+    #
+    # It turns out that .NET/CLR _can_ do this conversion.
+    #
+    # That is the reason why method FileUtil.WriteIStreamToFile(), below,
+    # takes an object, and casts it to an IStream, instead of directly
+    # taking an IStream inputStream argument.
 
-	$Compiler_Parameters = New-Object CodeDom.Compiler.CompilerParameters
-	$Compiler_Parameters.CompilerOptions = "/unsafe"
-	$Compiler_Parameters.WarningLevel = 4
-	$Compiler_Parameters.TreatWarningsAsErrors = $true
+    $Compiler_Parameters = New-Object CodeDom.Compiler.CompilerParameters
+    $Compiler_Parameters.CompilerOptions = "/unsafe"
+    $Compiler_Parameters.WarningLevel = 4
+    $Compiler_Parameters.TreatWarningsAsErrors = $true
 
-	Add-Type -CompilerParameters $Compiler_Parameters -TypeDefinition @"
+    Add-Type -CompilerParameters $Compiler_Parameters -TypeDefinition @"
 		using System;
 		using System.IO;
 		using System.Runtime.InteropServices.ComTypes;
@@ -301,5 +302,5 @@ function Write-IStreamToFile {
 		}
 "@
 
-	[My.FileUtil]::WriteIStreamToFile($IStream, $Path)
+    [My.FileUtil]::WriteIStreamToFile($IStream, $Path)
 }

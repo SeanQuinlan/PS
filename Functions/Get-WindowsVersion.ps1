@@ -21,15 +21,15 @@ function Get-WindowsVersion {
     }
 
     # Split the Version string into Major, Minor and Build
-    $VersionMajor,$VersionMinor,$VersionBuild = $WMICIMDetails.Version.Split('.')
+    $VersionMajor, $VersionMinor, $VersionBuild = $WMICIMDetails.Version.Split('.')
 
     # Output the WindowsVersion object
     [PSCustomObject]@{
-        'Caption'       = $WMICIMDetails.Caption
-        'Version'       = $WMICIMDetails.Version
-        'VersionMajor'  = $VersionMajor
-        'VersionMinor'  = $VersionMinor
-        'VerisonBuild'  = $VersionBuild
-        'Architecture'  = $WMICIMDetails.OSArchitecture
+        'Caption'      = $WMICIMDetails.Caption
+        'Version'      = $WMICIMDetails.Version
+        'VersionMajor' = $VersionMajor
+        'VersionMinor' = $VersionMinor
+        'VerisonBuild' = $VersionBuild
+        'Architecture' = $WMICIMDetails.OSArchitecture
     }
 }

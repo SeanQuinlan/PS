@@ -15,6 +15,7 @@ function Get-DotNetVersion {
     [CmdletBinding()]
     param(
         # Output all .NET versions found, not just the latest version
+        [Parameter(Mandatory = $false)]
         [Switch]
         $All
     )

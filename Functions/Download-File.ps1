@@ -14,10 +14,12 @@ function Download-File {
     [CmdletBinding()]
     param(
         # The URL to the download file
+        [Parameter(Mandatory = $true)]
         [String]
         $URL,
 
         # The download folder. Defaults to TEMP environment variable
+        [Parameter(Mandatory = $false)]
         [String]
         $Folder = $env:TEMP
     )
@@ -29,13 +31,12 @@ function Download-File {
     $Download_Succeeded = $false
 
     try {
-        Write-Verbose ('Downloading file [{0}] to [{1}]' -f $URL,$Download_File)
+        Write-Verbose ('Downloading file [{0}] to [{1}]' -f $URL, $Download_File)
         Invoke-WebRequest -Uri $URL -OutFile $Download_File
         if (Test-Path -Path $Download_File) {
             $Download_Succeeded = $true
         }
-    }
-    catch {
+    } catch {
         Write-Verbose ('Failed to download file:')
         Write-Verbose ($_.Exception.Message)
     }
