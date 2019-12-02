@@ -27,22 +27,24 @@ function Write-Log {
     [CmdletBinding()]
     param(
         # The text, or block of text to output to the log file
-        [Parameter(Mandatory=$true,
-                   ValueFromPipeline=$true,
-                   Position=0
+        [Parameter(
+            Mandatory = $true,
+            ValueFromPipeline = $true,
+            Position = 0
         )]
         [ValidateNotNullOrEmpty()]
-        [Alias('LogText','InputObject','Object','MessageData')]
+        [Alias('LogText', 'InputObject', 'Object', 'MessageData')]
         [Array]
         $Message,
 
         # The path to the log file
-        [Parameter(Mandatory=$false,
-                   Position=1
+        [Parameter(
+            Mandatory = $false,
+            Position = 1
         )]
-        [Alias('Log','LogFile','LogPath')]
+        [Alias('Log', 'LogFile', 'LogPath')]
         [String]
-        $Path = $(if ($script:WriteLogPath) { $script:WriteLogPath } else { (Join-Path -Path $PSScriptRoot -ChildPath ('{0}-{1}.log' -f ([io.fileinfo]$PSCommandPath).BaseName,(Get-Date -Format yyyyMMdd)))} ),
+        $Path = $(if ($script:WriteLogPath) { $script:WriteLogPath } else { (Join-Path -Path $PSScriptRoot -ChildPath ('{0}-{1}.log' -f ([io.fileinfo]$PSCommandPath).BaseName, (Get-Date -Format yyyyMMdd))) } ),
 
         # The DateFormat to prefix each line with
         [Alias('DateFormat')]
@@ -83,15 +85,15 @@ function Write-Log {
 
     process {
         foreach ($Line in $Message) {
-            '{0} {1}' -f $DatePrefix,$Line | Out-File -FilePath $Path -Append
+            '{0} {1}' -f $DatePrefix, $Line | Out-File -FilePath $Path -Append
             switch ($true) {
-                $OutDebug       { Write-Debug $Line }
-                $OutError       { Write-Error $Line }
-                $OutHost        { Write-Host $Line }
+                $OutDebug { Write-Debug $Line }
+                $OutError { Write-Error $Line }
+                $OutHost { Write-Host $Line }
                 $OutInformation { Write-Information $Line }
-                $OutProgress    { Write-Progress $Line }
-                $OutVerbose     { Write-Verbose $Line }
-                $Out-Warning    { Write-Warning $Line }
+                $OutProgress { Write-Progress $Line }
+                $OutVerbose { Write-Verbose $Line }
+                $OutWarning { Write-Warning $Line }
             }
         }
     }
