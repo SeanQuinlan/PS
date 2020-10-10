@@ -7,6 +7,10 @@ function Write-Log {
         Log file can be specified on the command line, or via the $WriteLogPath script scope variable.
         If no log file is given, it will log to a text file with the same name as the script, with the current yyyyMMdd appended.
         In addition, can log to one or more of the other output streams: Debug, Error, Host, Information, Progress, Verbose, Warning
+
+        The following script scope variables can be declared in order to set defaults for the function to use, without needing to pass them to every call
+            * $script:WriteLogPath - Path to the log file
+            * $script:WriteLogDatePrefix - The date format to use
     .EXAMPLE
         Write-Log -Message 'This is a test log line' -Path 'c:\windows\temp\log.txt' -OutHost
     .EXAMPLE
@@ -26,7 +30,7 @@ function Write-Log {
     #>
     [CmdletBinding()]
     param(
-        # The text, or block of text to output to the log file
+        # The text, or array of text to output to the log file
         [Parameter(
             Mandatory = $true,
             ValueFromPipeline = $true,
