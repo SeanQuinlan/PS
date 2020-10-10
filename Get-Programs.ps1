@@ -24,7 +24,7 @@
 [CmdletBinding()]
 param(
     # Computer(s) to run against
-    [Parameter(Mandatory = $true, ValueFromPipeline = $true)]
+    [Parameter(Mandatory = $false, ValueFromPipeline = $true)]
     [Alias('Name', 'CN')]
     [String[]]
     $ComputerName = 'localhost',
@@ -49,9 +49,6 @@ begin {
             Get-FriendlySize -Bytes 1024 -Decimals 3
         .EXAMPLE
             Get-FriendlySize -Bytes (1024*1024) -FormatType 'Programs'
-        .NOTES
-            Author: Sean Quinlan
-            Email:  sean@yster.org
         #>
 
         [CmdletBinding()]
@@ -102,8 +99,12 @@ begin {
 
     $PSBoundParameters.GetEnumerator() | ForEach-Object { Write-Verbose ('Arguments: {0} - {1}' -f $_.Key, ($_.Value -join ' ')) }
     $Registry_Locations = @('SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall')
-    if ($env:PROCESSOR_ARCHITECTURE -eq 'x86') { Write-Warning 'Running in PowerShell (x86). Only x86 software will be captured. Run from PowerShell console on x64 machine to capture all software' }
-    if ($env:PROCESSOR_ARCHITECTURE -eq 'AMD64') { $Registry_Locations += 'SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall' }
+    if ($env:PROCESSOR_ARCHITECTURE -eq 'x86') {
+        Write-Warning 'Running in PowerShell (x86). Only x86 software will be captured. Run from PowerShell console on x64 machine to capture all software'
+    }
+    if ($env:PROCESSOR_ARCHITECTURE -eq 'AMD64') {
+        $Registry_Locations += 'SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall'
+    }
 }
 
 process {
