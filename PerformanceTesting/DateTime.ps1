@@ -1,50 +1,36 @@
-# Some tests to find out the fastest method of suppressing output.
+# Some tests to find out the fastest method of outputting the date and time.
 
 $Size = 10000
 $TestArray = 1..$Size
 $Output = New-Object -TypeName 'System.Collections.ArrayList'
+$DateFormat = 'yyyy-MM-dd HH:mm:ss'
 
-# Using [void]
+# Using Get-Date
 $Measure_Array = Measure-Command {
     for ($i = 0; $i -lt $TestArray.Count; $i++) {
-        [void]'Test String'
+        Get-Date -Format $DateFormat
     }
 }
 
 [System.GC]::Collect()
 [void]$Output.Add(
     [pscustomobject]@{
-        'Name' = 'Using [void]'
+        'Name' = 'Using Get-Date'
         'Time' = $Measure_Array.TotalMilliseconds
     }
 )
 
-# Using Out-Null
+# Using DateTime::Now
 $Measure_Array = Measure-Command {
     for ($i = 0; $i -lt $TestArray.Count; $i++) {
-        'Test String' | Out-Null
+        [DateTime]::Now.ToString($DateFormat)
     }
 }
 
 [System.GC]::Collect()
 [void]$Output.Add(
     [pscustomobject]@{
-        'Name' = 'Using Out-Null'
-        'Time' = $Measure_Array.TotalMilliseconds
-    }
-)
-
-# Using $null =
-$Measure_Array = Measure-Command {
-    for ($i = 0; $i -lt $TestArray.Count; $i++) {
-        $null = 'Test String'
-    }
-}
-
-[System.GC]::Collect()
-[void]$Output.Add(
-    [pscustomobject]@{
-        'Name' = 'Using $null ='
+        'Name' = 'DateTime::Now'
         'Time' = $Measure_Array.TotalMilliseconds
     }
 )
